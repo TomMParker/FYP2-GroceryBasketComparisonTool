@@ -1,5 +1,7 @@
 import pandas as pd
 from scipy.stats import friedmanchisquare, rankdata
+import numpy as np
+import pingouin as pg
 
 
 class StatisticalAnalysis:
@@ -8,9 +10,10 @@ class StatisticalAnalysis:
         # copy data frame and calc zscores
         df_copy = df.copy()
         df_copy['price_zscore'] = df_copy.groupby('product_id')['price'].transform(
-            lambda x: (x - x.mean()) / x.std()
+            lambda x: (x - x.mean()) / x.std() if x.std() != 0 else 0 # if: prevent /0 error
         )
         return df_copy
+
 
 
     # find items that z-score is
@@ -43,15 +46,15 @@ class StatisticalAnalysis:
         # get shop names from pivot columns
         shops = pivot_df.columns.tolist()
 
-
         # prepare data for Friedman test
-        shop_data = [pivot_df[shop].dropna() for shop in shops]
+        shop_data = [pivot_df[shop].values for shop in shops]
 
         # perform test
-        if all(len(data) > 0 for data in shop_data):
-            stat, p_value = friedmanchisquare(*shop_data)
-            return stat, p_value
-        else:
+        try:
+            stat, p = friedmanchisquare(*shop_data, nan_policy='omit')
+            return stat, p
+        except Exception as e:
+            print("Error in test")
             return None, None
 
     def perform_friedman_test_on_ratings(self, df):
@@ -62,7 +65,6 @@ class StatisticalAnalysis:
             values='rating'
         )
 
-
         #tidy this??
         # get shop names from pivot columns
         shops = pivot_df.columns.tolist()
@@ -72,8 +74,9 @@ class StatisticalAnalysis:
         shop_data = [pivot_df[shop].dropna() for shop in shops]
 
         # perform test
-        if all(len(data) > 0 for data in shop_data):
-            stat, p_value = friedmanchisquare(*shop_data)
-            return stat, p_value
-        else:
+        try:
+            stat, p = friedmanchisquare(*shop_data, nan_policy='omit')
+            return stat, p
+        except Exception as e:
+            print("Error in test")
             return None, None
