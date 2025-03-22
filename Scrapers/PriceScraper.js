@@ -57,21 +57,6 @@ async function getAldiPrice(url) {
     return price;
 }
 
-// tesco
-async function getTescoPrice() {
-    const {browser, page} = await setupBrowser();
-    await page.goto(tescoLink, {waitUntil: 'networkidle2'});
-
-    await page.waitForSelector('.text__StyledText-sc-1jpzi8m-0.lmgzsH.ddsweb-text.styled__PriceText-sc-v0qv7n-1.eNIEDh');
-    const price = await page.evaluate(() => {
-        const priceElement = document.querySelector('.text__StyledText-sc-1jpzi8m-0.lmgzsH.ddsweb-text.styled__PriceText-sc-v0qv7n-1.eNIEDh');
-        return priceElement ? parseFloat(priceElement.textContent.trim().replace('£', '')) : null;
-    });
-
-    console.log('Tesco Price:', price);
-    await browser.close();
-    return price;
-}
 
 // upserter
 async function upsertPrice(connection, productId, shopId, price) {
@@ -100,7 +85,7 @@ async function upsertPrice(connection, productId, shopId, price) {
 
         // get products
         const [products] = await connection.execute(`
-      SELECT product_id, asda_link, aldi_link, sainsburys_link, tesco_link
+      SELECT product_id, asda_link, aldi_link, sainsburys_link
       FROM Products
     `);
 
@@ -110,7 +95,6 @@ async function upsertPrice(connection, productId, shopId, price) {
             let asdaPrice = null;
             let sainsPrice = null;
             let aldiPrice = null;
-            let tescoPrice = null;
 
             // scrape Asda
             try {
@@ -142,16 +126,6 @@ async function upsertPrice(connection, productId, shopId, price) {
                 );
             }
 
-            // scrape tesco
-            try {
-                tescoPrice = await getTescoPrice(tesco_link);
-            } catch (err) {
-                console.error(
-                    `Error scraping Aldi (product_id=${product_id}, link=${tesco_link}):`,
-                    err
-                );
-            }
-
             // upsert each price if available
             if (asdaPrice !== null) {
                 await upsertPrice(connection, product_id, 1, asdaPrice);
@@ -162,10 +136,6 @@ async function upsertPrice(connection, productId, shopId, price) {
             if (aldiPrice !== null) {
                 await upsertPrice(connection, product_id, 2, aldiPrice);
             }
-            if (tescoPrice !== null) {
-                await upsertPrice(connection, product_id, 4, tescoPrice);
-            }
-
         }
 
         console.log('Scraping Complete');
