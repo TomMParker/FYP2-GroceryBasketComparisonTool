@@ -16,7 +16,18 @@ class ScoreCalculator:
             'Tesco': 1.0 / preferences['tesco_preference'],
         }
 
-        return pref_scores
+        # min-max of pref scores
+        min_score = min(pref_scores.values())
+        max_score = max(pref_scores.values())
+
+        # normalise to 0-1 range
+        convenience_scores = {
+            shop: (score - min_score) / (max_score - min_score)
+            for shop, score in pref_scores.items()
+        }
+
+
+        return convenience_scores
 
 
 
