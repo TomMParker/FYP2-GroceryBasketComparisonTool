@@ -27,7 +27,7 @@ class DataManager:
     def get_user_data(self, user_id):
         # get user weightings
         weighting_query = """
-            SELECT price_weight, convenience_weight, quality_weight
+            SELECT price_weight, convenience_weight, quality_weight, price_difference_threshold
             FROM UserWeightings
             WHERE user_id = %s
         """
