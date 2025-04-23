@@ -25,15 +25,16 @@ class StatisticalAnalysis:
         df_copy['price_outliers'] = df_copy['price_zscore'].abs() > threshold
         return df_copy
 
-    def rank_prices(self, df):
-        df_copy = df.copy()
-        df_copy['rank'] = df_copy.groupby('product_id')['price'].transform(
-            lambda x: rankdata(x, method='average')
-        )
-        return df_copy
+    # no longer needed, used in early version of Friedman test, check for other uses and delete
+    #def rank_prices(self, df):
+    #   df_copy = df.copy()
+    #   df_copy['rank'] = df_copy.groupby('product_id')['price'].transform(
+    #     lambda x: rankdata(x, method='average')
+    #)
+        #return df_copy
 
-    def calculate_rank_sums(self, df):
-        return df.groupby('shop_name')['rank'].sum().reset_index()
+    #def calculate_rank_sums(self, df):
+    #   return df.groupby('shop_name')['rank'].sum().reset_index()
 
     def perform_friedman_test_on_price(self, df):
         # get prices for each product across shops
@@ -43,11 +44,14 @@ class StatisticalAnalysis:
             values='price'
         )
 
+        #rank shops, lower prices = higher rank
+        ranked_df = pivot_df.rank(axis=1, method='average', ascending=True)
+
         # get shop names from pivot columns
-        shops = pivot_df.columns.tolist()
+        shops = ranked_df.columns.tolist()
 
         # prepare data for Friedman test
-        shop_data = [pivot_df[shop].values for shop in shops]
+        shop_data = [ranked_df[shop] for shop in shops]
 
         # perform test
         try:
@@ -65,13 +69,14 @@ class StatisticalAnalysis:
             values='rating'
         )
 
-        #tidy this??
-        # get shop names from pivot columns
-        shops = pivot_df.columns.tolist()
+        # rank shops, higher rating = higher rank
+        ranked_df = pivot_df.rank(axis=1, method='average', ascending=False)
 
+        # get shop names from pivot columns
+        shops = ranked_df.columns.tolist()
 
         # prepare data for Friedman test
-        shop_data = [pivot_df[shop].dropna() for shop in shops]
+        shop_data = [ranked_df[shop] for shop in shops]
 
         # perform test
         try:
