@@ -69,6 +69,10 @@ class BasketAnalysis:
                 df  # pass the dataframe
             )
 
+            # 10b: add outlier recommendation to main
+            outlier_recommendation = self.report_generator.generate_outliers_recommendation(df)
+            recommendation += outlier_recommendation
+
             # 11: export results
             self.report_generator.export_excel(final_table, wsm_scores, basket_id, user_id, "report_exports")
 
@@ -85,8 +89,8 @@ class BasketAnalysis:
 # test run
 if __name__ == "__main__":
     analyser = BasketAnalysis()
-    basket_id = 13
-    user_id = 1
+    basket_id = 14
+    user_id = 6
 
     df, final_table, friedman_stat, friedman_p_value, rating_friedman_stat, rating_friedman_p_value, wsm_scores, recommendation = analyser.analyse_basket(basket_id, user_id)
 

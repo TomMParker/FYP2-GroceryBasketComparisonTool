@@ -101,36 +101,36 @@ class ReportGenerator:
         if price_important and quality_important:
             # .. and both are significant:
             if price_significant and rating_significant:
-                recommendation += "Statistical analysis confirms that both price and quality differences between shops are significant. " \
-                                  "Your balanced preference for these factors aligns well with the observed differences between shops.\n\n"
+                recommendation += "Statistical analysis confirms that both price and quality differences between shops are significant.\n " \
+                                  "Your balanced preference for these factors aligns well with the observed differences between shops.\n"
 
             # .. price significant but not ratings
             elif price_significant and not rating_significant:
-                recommendation += "Statistical analysis shows that price differences between shops are significant, but quality ratings are similar. " \
-                                  "\nYour preference for both factors is balanced, so you might want to consider increasing your price weighting.\n\n"
+                recommendation += "Statistical analysis shows that price differences between shops are significant, but quality ratings are similar. \n" \
+                                  "\nYour preference for both factors is balanced, so you might want to consider increasing your price weighting.\n"
             # .. price not significant but ratings are
             elif not price_significant and rating_significant:
-                recommendation += "Statistical analysis shows that quality differences between shops are significant, while price patterns are less pronounced. "
+                recommendation += "Statistical analysis shows that quality differences between shops are significant, while price patterns are less pronounced.\n "
                 if user_defined_significant_price_diff:
-                    recommendation += f"\nHowever, there is still a total basket price difference of £{price_difference:.2f} between {cheapest_store} (£{cheapest_price:.2f}) and {most_expensive_store} (£{most_expensive_price:.2f}). "
-                recommendation += "\nYour preference for both factors is balanced, but you might want to consider increasing your quality weighting.\n\n"
+                    recommendation += f"\nHowever, there is still a total basket price difference of £{price_difference:.2f} between {cheapest_store} (£{cheapest_price:.2f}) and {most_expensive_store} (£{most_expensive_price:.2f}).\n "
+                recommendation += "\nYour preference for both factors is balanced, but you might want to consider increasing your quality weighting.\n"
             # .. neither significant
             else:
                 recommendation += "While statistical tests don't show significant differences in price or quality patterns across all products, "
                 if user_defined_significant_price_diff:
-                    recommendation += f"there is a total basket price difference of £{price_difference:.2f} between {cheapest_store} (£{cheapest_price:.2f}) and {most_expensive_store} (£{most_expensive_price:.2f}), which may be meaningful to you.\n\n"
+                    recommendation += f"there is a total basket price difference of £{price_difference:.2f} between {cheapest_store} (£{cheapest_price:.2f}) and {most_expensive_store} (£{most_expensive_price:.2f}), which may be meaningful to you.\n"
                 else:
-                    recommendation += "the shops offer fairly similar value based on your preferences.\n\n"
+                    recommendation += "the shops offer fairly similar value based on your preferences.\n"
 
         # user care mainly about price:
         elif price_important and not quality_important:
             if price_significant:
-                recommendation += "Statistical analysis confirms that price differences between shops are significant. "
+                recommendation += "Statistical analysis confirms that price differences between shops are significant.\n "
                 if cheapest_store != best_shop:
                     recommendation += f"\nEven though {cheapest_store} offers the lowest total price, your weightings towards convenience and ratings have influenced the final recommendation. "
                 else:
-                    recommendation += f"Your focus on price aligns well with the observed differences between shops. "
-                recommendation += "\n\n"
+                    recommendation += f"\nYour focus on price aligns well with the observed differences between shops. "
+                recommendation += "\n"
             else:
                 recommendation += "While statistical tests don't show significant price patterns across all products, "
                 if user_defined_significant_price_diff:
@@ -142,14 +142,14 @@ class ReportGenerator:
                         recommendation += f"\nThis aligns with your preference for price as the most important factor. "
                 else:
                     recommendation += "and the total basket prices are quite similar across stores. " \
-                                      "Since price is important to you, you may want to consider any of these shops as they offer similar value.\n"
+                                      "Since price is important to you, you may want to consider any of these shops as they offer similar value."
                 recommendation += "\n"
 
         # user care mainly about quality:
         elif quality_important and not price_important:
             if rating_significant:
-                recommendation += "Statistical analysis confirms that quality differences between shops are significant. " \
-                                  "Your focus on quality aligns well with the observed differences between shops.\n\n"
+                recommendation += "Statistical analysis confirms that quality differences between shops are significant.\n " \
+                                  "\nYour focus on quality aligns well with the observed differences between shops.\n"
             else:
                 recommendation += "Statistical tests don't show significant quality differences across all products, "
                 if user_defined_significant_price_diff:
@@ -158,23 +158,23 @@ class ReportGenerator:
                     if highest_rated_store != best_shop:
                         recommendation += f"\nEven though {highest_rated_store} offers the highest average quality ratings, your weightings towards convenience and price have influenced the final recommendation. "
                 else:
-                    recommendation += "quality ratings are fairly similar across stores. " \
-                                      "\nSince quality is important to you, you may want to consider any of these shops as they offer similar value.\n"
+                    recommendation += "quality ratings are fairly similar across stores.\n " \
+                                      "\nSince quality is important to you, you may want to consider any of these shops as they offer similar value."
                 recommendation += "\n"
 
         else:
             # user cares mainly convenience over price and quality:
             if convenience_important:
-                recommendation += "Based on your preferences, convenience appears to be your primary concern. "
+                recommendation += "Based on your preferences, convenience appears to be your primary concern.\n"
                 if not price_significant and user_defined_significant_price_diff:
                     recommendation += f"\nNote that there is a price difference of £{price_difference:.2f} between {cheapest_store} and {most_expensive_store} for this basket, which you may want to consider alongside your convenience preference. "
-                recommendation += "\n\n"
+                recommendation += "\n"
             else:
                 recommendation += "Your preferences don't show a strong weighting toward any specific factor. " \
-                                  "Consider adjusting your weightings to better reflect what's important to you.\n\n"
+                                  "Consider adjusting your weightings to better reflect what's important to you.\n"
 
         # main shop recommendation
-        recommendation += f"Considering your overall preferences, the recommended shop for you to buy your goods at is: {best_shop}\n\n"
+        recommendation += f"\nConsidering your overall preferences, the recommended shop for you to buy your goods at is: {best_shop}\n"
 
 
         # if best_shop is not same as preferred shop add savings and ratings diff
@@ -208,7 +208,7 @@ class ReportGenerator:
             best_shop_avg_rating = df[df['shop_name'] == best_shop]['rating'].mean()
             rating_diff_pct = ((best_shop_avg_rating - preferred_avg_rating) / preferred_avg_rating * 100)
 
-            comparison = f"Your preferred shop is {preferred_shop}, however if you were to switch to {best_shop} "
+            comparison = f"\nYour preferred shop is {preferred_shop}, however if you were to switch to {best_shop} "
 
             # if there are price savings..
             if price_savings > 0:
@@ -237,6 +237,24 @@ class ReportGenerator:
             recommendation += comparison
 
         return recommendation
+
+    def generate_outliers_recommendation (self, df):
+
+        outliers_df= df[df['price_outliers']]
+
+        if outliers_df.empty:
+            return ""
+
+        outlier_recommendation = f"\nThe following outliers were detected in your basket and may be effecting your recommendation:"
+
+        for shop in outliers_df['shop_name'].unique():
+            shop_outlier = outliers_df[outliers_df['shop_name'] == shop]
+            outlier_recommendation += f"\n\nShop: {shop}"
+            for _, row in shop_outlier.iterrows():
+                price_type = "High price outlier" if row['price_zscore'] > 0 else "Low price outlier"
+                outlier_recommendation += f"\n{row['product_name']}: £{row['price']:.2f} ({price_type})"
+
+        return outlier_recommendation
 
 
     def export_excel(self, final_table, wsm_scores, basket_id, user_id, output_dir="."):
