@@ -45,7 +45,7 @@ class ScoreCalculator:
                         (group['price'].max() - group['price']) / price_range
                 )
             else:
-                df_copy.loc[group.index, 'normalised_price'] = 1.0  # **check
+                df_copy.loc[group.index, 'normalised_price'] = 1.0
 
             # normalise rating higher better
             rating_range = group['rating'].max() - group['rating'].min()
@@ -75,7 +75,7 @@ class ScoreCalculator:
         if max_price_sum > 0:
             wsm_scores['normalised_price'] = wsm_scores['normalised_price'] / max_price_sum
         if max_rating_sum > 0:
-            wsm_scores['normalised_rating'] = wsm_scores['normalised_rating'] / max_price_sum
+            wsm_scores['normalised_rating'] = wsm_scores['normalised_rating'] / max_rating_sum
 
         # calculate WSM scores
         wsm_scores['wsm_score'] = (

@@ -1,3 +1,5 @@
+import pandas as pd
+
 from data_manager import DataManager
 from statistical_analysis import StatisticalAnalysis
 from score_calculator import ScoreCalculator
@@ -60,7 +62,7 @@ class BasketAnalysis:
             final_table = self.report_generator.create_final_table(df)
 
             # 10: generate recommendation
-            recommendation = self.report_generator.generate_enhanced_recommendation(
+            recommendation = self.report_generator.generate_recommendation(
                 wsm_scores,
                 weights,
                 preferences,
@@ -69,7 +71,15 @@ class BasketAnalysis:
                 df  # pass the dataframe
             )
 
-            # 10b: add outlier recommendation to main
+            # 10b: add preferred shop comparison to main
+            shop_comparison = self.report_generator.add_preferred_shop_comparison(
+                "", df, wsm_scores, preferences,
+                wsm_scores.loc[wsm_scores['wsm_score'].idxmax(), 'shop_name']
+            )
+            recommendation += shop_comparison
+
+
+            # 10c: add outlier recommendation to main
             outlier_recommendation = self.report_generator.generate_outliers_recommendation(df)
             recommendation += outlier_recommendation
 
@@ -89,8 +99,8 @@ class BasketAnalysis:
 # test run
 if __name__ == "__main__":
     analyser = BasketAnalysis()
-    basket_id = 14
-    user_id = 6
+    basket_id = 13
+    user_id = 5
 
     df, final_table, friedman_stat, friedman_p_value, rating_friedman_stat, rating_friedman_p_value, wsm_scores, recommendation = analyser.analyse_basket(basket_id, user_id)
 
@@ -114,7 +124,9 @@ if __name__ == "__main__":
 
     # print WSM scores (sorted by score, descending)
     print("\nWeighted Sum Model Scores:")
-    print("-" * 53)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 120)
+    print("-" * 87)
     print(wsm_scores.sort_values('wsm_score', ascending=False))
 
     # print friedman test results for prices

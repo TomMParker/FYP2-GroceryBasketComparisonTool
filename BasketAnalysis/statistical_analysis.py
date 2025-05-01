@@ -25,16 +25,6 @@ class StatisticalAnalysis:
         df_copy['price_outliers'] = df_copy['price_zscore'].abs() > threshold
         return df_copy
 
-    # no longer needed, used in early version of Friedman test, check for other uses and delete
-    #def rank_prices(self, df):
-    #   df_copy = df.copy()
-    #   df_copy['rank'] = df_copy.groupby('product_id')['price'].transform(
-    #     lambda x: rankdata(x, method='average')
-    #)
-        #return df_copy
-
-    #def calculate_rank_sums(self, df):
-    #   return df.groupby('shop_name')['rank'].sum().reset_index()
 
     def perform_friedman_test_on_price(self, df):
         # get prices for each product across shops

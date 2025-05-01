@@ -34,17 +34,10 @@ class ReportGenerator:
 
         return final_table
 
-    # def generate_recommendation(self, wsm_scores):
-    #     if wsm_scores.empty:
-    #         return "Not enough data to make a recommendation."
-    #
-    #     best_shop = wsm_scores.loc[wsm_scores['wsm_score'].idxmax(), 'shop_name']
-    #     return f"Considering your preferences, the best shop for you to buy your goods at is: {best_shop}"
-
-    # generates recommendation basend on wsm scores, user weights and statistical analysis
+     # generates recommendation basend on wsm scores, user weights and statistical analysis
     # threshold arg determines what level a weighting is deemed important
-    def generate_enhanced_recommendation(self, wsm_scores, weights, preferences, price_friedman, rating_friedman, df,
-                                         threshold=0.33):
+    def generate_recommendation(self, wsm_scores, weights, preferences, price_friedman, rating_friedman, df,
+                                threshold=0.33):
 
         if wsm_scores.empty:
             return "Not enough data to make a recommendation."
@@ -165,7 +158,7 @@ class ReportGenerator:
         else:
             # user cares mainly convenience over price and quality:
             if convenience_important:
-                recommendation += "Based on your preferences, convenience appears to be your primary concern.\n"
+                recommendation += "Based on your preferences, convenience appears to be your primary concern."
                 if not price_significant and user_defined_significant_price_diff:
                     recommendation += f"\nNote that there is a price difference of £{price_difference:.2f} between {cheapest_store} and {most_expensive_store} for this basket, which you may want to consider alongside your convenience preference. "
                 recommendation += "\n"
@@ -177,13 +170,10 @@ class ReportGenerator:
         recommendation += f"\nConsidering your overall preferences, the recommended shop for you to buy your goods at is: {best_shop}\n"
 
 
-        # if best_shop is not same as preferred shop add savings and ratings diff
-        recommendation = self._add_preferred_shop_comparison(recommendation, df, wsm_scores, preferences, best_shop)
-
         return recommendation
 
     # adds comparison between preferred shop and best_shop if different
-    def _add_preferred_shop_comparison(self, recommendation, df, wsm_scores, preferences, best_shop):
+    def add_preferred_shop_comparison(self, recommendation, df, wsm_scores, preferences, best_shop):
 
         # store user shop preferences
         shop_preferences = {
@@ -219,7 +209,7 @@ class ReportGenerator:
                     comparison += f"and have an improvement in quality (based on ratings) of {rating_diff_pct:.1f}%."
                 # .. but quality is worse
                 elif rating_diff_pct < 0:
-                    comparison += f"but quality ratings would be {abs(rating_diff_pct):.1f}% lower."
+                    comparison += f"but quality ratings would be {abs(rating_diff_pct):.1f}% lower.\n"
                 # .. but quality is similar
                 else:
                     comparison += f"with similar quality ratings."
